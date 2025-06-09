@@ -84,4 +84,51 @@ public class RegresTests {
                 .then()
                 .statusCode(204);
     }
+    @Test
+    @DisplayName("Обновление пользователя")
+    public void testUpdateUser() {
+        String requestBody = """
+    {
+        "name": "morpheus",
+        "job": "zion resident"
+    }
+    """;
+
+        RestAssured
+                .given()
+                .header("x-api-key","reqres-free-v1")
+                .baseUri("https://reqres.in")
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .put("/api/users/2")
+                .then()
+                .statusCode(200)
+                .body("name", equalTo("morpheus"))
+                .body("job", equalTo("zion resident"))
+                .body("updatedAt", notNullValue());
+    }
+
+    @Test
+    @DisplayName("Частичное обновление пользователя")
+    public void testUpdateUserWithPatch() {
+        String requestBody = """
+    {
+        "job": "leader of rebels"
+    }
+    """;
+
+        RestAssured
+                .given()
+                .header("x-api-key","reqres-free-v1")
+                .baseUri("https://reqres.in")
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .patch("/api/users/2")
+                .then()
+                .statusCode(200)
+                .body("job", equalTo("leader of rebels"))
+                .body("updatedAt", notNullValue());
+    }
 }

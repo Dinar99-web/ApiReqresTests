@@ -1,6 +1,7 @@
 import io.qameta.allure.*;
 import models.*;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -14,6 +15,7 @@ import static specs.Specs.*;
 public class RegresTests {
 
     @Test
+    @Tag("HomeWork")
     @DisplayName("Получение списка пользователей")
     @Severity(SeverityLevel.BLOCKER)
     void testGetUsersList() {
@@ -30,6 +32,7 @@ public class RegresTests {
     }
 
     @Test
+    @Tag("HomeWork")
     @DisplayName("Получение одного пользователя")
     @Severity(SeverityLevel.CRITICAL)
     void testGetSingleUser() {
@@ -49,6 +52,7 @@ public class RegresTests {
     }
 
     @Test
+    @Tag("HomeWork")
     @DisplayName("Пользователь не найден")
     @Severity(SeverityLevel.NORMAL)
     void testGetSingleUserNotFound() {
@@ -62,6 +66,7 @@ public class RegresTests {
     }
 
     @Test
+    @Tag("HomeWork")
     @DisplayName("Создание пользователя")
     @Severity(SeverityLevel.CRITICAL)
     void testCreateUser() {
@@ -85,7 +90,8 @@ public class RegresTests {
     }
 
     @Test
-    @DisplayName("Обновление пользователя (PUT)")
+    @Tag("HomeWork")
+    @DisplayName("Обновление пользователя")
     @Severity(SeverityLevel.CRITICAL)
     void testUpdateUser() {
         UserRequest userRequest = new UserRequest()
@@ -107,6 +113,7 @@ public class RegresTests {
     }
 
     @Test
+    @Tag("HomeWork")
     @DisplayName("Частичное обновление пользователя (PATCH)")
     @Severity(SeverityLevel.CRITICAL)
     void testUpdateUserWithPatch() {
@@ -127,6 +134,7 @@ public class RegresTests {
     }
 
     @Test
+    @Tag("HomeWork")
     @DisplayName("Удаление пользователя")
     @Severity(SeverityLevel.CRITICAL)
     void testDeleteUser() {

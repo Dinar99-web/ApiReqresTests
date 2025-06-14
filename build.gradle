@@ -58,3 +58,8 @@ tasks.withType(Test) {
         }
     }
 }
+task homework_test(type: Test) {
+    useJUnitPlatform {
+        includeTags("HomeWork")
+    }
+}

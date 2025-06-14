@@ -5,7 +5,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class UserRequest {
+public class UserRequestModel {
     private String name;
     private String job;
 }

@@ -1,5 +1,8 @@
 import io.qameta.allure.*;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import models.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -14,17 +17,26 @@ import static org.hamcrest.Matchers.equalTo;
 @Owner("YourName")
 public class ReqresTests {
 
+    @BeforeAll
+    static void setup() {
+        RestAssured.baseURI = "https://reqres.in";
+        RestAssured.basePath = "/api";
+        RestAssured.requestSpecification = given()
+                .log().all()
+                .contentType(ContentType.JSON)
+                .header("x-api-key", "reqres-free-v1");
+    }
+
     @Test
     @Tag("HomeWork")
     @DisplayName("Получение списка пользователей")
     @Severity(SeverityLevel.BLOCKER)
     void getUsersListTest() {
         UserListResponseModel response = given()
-                .spec(Specs.getRequestSpec())
                 .when()
                 .get("/users?page=2")
                 .then()
-                .spec(Specs.getResponseSpec(200))
+                .spec(Specs.responseSpec(200))
                 .extract().as(UserListResponseModel.class);
 
         assertThat(response.getPage()).isEqualTo(2);
@@ -37,11 +49,10 @@ public class ReqresTests {
     @Severity(SeverityLevel.CRITICAL)
     void getSingleUserTest() {
         UserDataModel response = given()
-                .spec(Specs.getRequestSpec())
                 .when()
                 .get("/users/2")
                 .then()
-                .spec(Specs.getResponseSpec(200))
+                .spec(Specs.responseSpec(200))
                 .extract().as(UserDataModel.class);
 
         UserModel user = response.getData();
@@ -57,11 +68,10 @@ public class ReqresTests {
     @Severity(SeverityLevel.NORMAL)
     void getSingleUserNotFoundTest() {
         given()
-                .spec(Specs.getRequestSpec())
                 .when()
                 .get("/users/23")
                 .then()
-                .spec(Specs.getResponseSpec(404))
+                .spec(Specs.responseSpec(404))
                 .body(equalTo("{}"));
     }
 
@@ -75,12 +85,11 @@ public class ReqresTests {
                 .setJob("leader");
 
         UserResponseModel response = given()
-                .spec(Specs.getRequestSpec())
                 .body(userRequest)
                 .when()
                 .post("/users")
                 .then()
-                .spec(Specs.getResponseSpec(201))
+                .spec(Specs.responseSpec(201))
                 .extract().as(UserResponseModel.class);
 
         assertThat(response.getName()).isEqualTo("morpheus");
@@ -99,12 +108,11 @@ public class ReqresTests {
                 .setJob("zion resident");
 
         UserResponseModel response = given()
-                .spec(Specs.getRequestSpec())
                 .body(userRequest)
                 .when()
                 .put("/users/2")
                 .then()
-                .spec(Specs.getResponseSpec(200))
+                .spec(Specs.responseSpec(200))
                 .extract().as(UserResponseModel.class);
 
         assertThat(response.getName()).isEqualTo("morpheus");
@@ -121,12 +129,11 @@ public class ReqresTests {
                 .setJob("leader of rebels");
 
         UserResponseModel response = given()
-                .spec(Specs.getRequestSpec())
                 .body(userRequest)
                 .when()
                 .patch("/users/2")
                 .then()
-                .spec(Specs.getResponseSpec(200))
+                .spec(Specs.responseSpec(200))
                 .extract().as(UserResponseModel.class);
 
         assertThat(response.getJob()).isEqualTo("leader of rebels");
@@ -139,11 +146,10 @@ public class ReqresTests {
     @Severity(SeverityLevel.CRITICAL)
     void deleteUserTest() {
         given()
-                .spec(Specs.getRequestSpec())
                 .when()
                 .delete("/users/2")
                 .then()
-                .spec(Specs.getResponseSpec(204));
+                .spec(Specs.responseSpec(204));
     }
 
     @Test
@@ -154,12 +160,11 @@ public class ReqresTests {
         String requestBody = "{\"email\": \"eve.holt@reqres.in\", \"password\": \"pistol\"}";
 
         given()
-                .spec(Specs.getRequestSpec())
                 .body(requestBody)
                 .when()
                 .post("/register")
                 .then()
-                .spec(Specs.getResponseSpec(200))
+                .spec(Specs.responseSpec(200))
                 .body("id", equalTo(4))
                 .body("token", equalTo("QpwL5tke4Pnpja7X4"));
     }
@@ -172,12 +177,11 @@ public class ReqresTests {
         String requestBody = "{\"email\": \"sydney@fife\"}";
 
         given()
-                .spec(Specs.getRequestSpec())
                 .body(requestBody)
                 .when()
                 .post("/register")
                 .then()
-                .spec(Specs.getResponseSpec(400))
+                .spec(Specs.responseSpec(400))
                 .body("error", equalTo("Missing password"));
     }
 }

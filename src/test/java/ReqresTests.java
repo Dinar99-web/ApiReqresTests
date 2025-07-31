@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.*;
 
 @Feature("Reqres API Tests")
 @Story("User Operations")
-@Owner("YourName")
+@Owner("Dinar Aminev")
 public class ReqresTests {
 
     @BeforeAll
@@ -23,7 +23,7 @@ public class ReqresTests {
     }
 
     @Test
-    @Tag("HomeWork")
+    @Tag("ApiTests")
     @DisplayName("Получение списка пользователей (GET)")
     @Severity(SeverityLevel.BLOCKER)
     void getUsersListTest() {
@@ -48,7 +48,7 @@ public class ReqresTests {
     }
 
     @Test
-    @Tag("HomeWork")
+    @Tag("ApiTests")
     @DisplayName("Получение одного пользователя (GET)")
     @Severity(SeverityLevel.CRITICAL)
     void getSingleUserTest() {
@@ -71,7 +71,7 @@ public class ReqresTests {
     }
 
     @Test
-    @Tag("HomeWork")
+    @Tag("ApiTests")
     @DisplayName("Пользователь не найден (GET)")
     @Severity(SeverityLevel.NORMAL)
     void getSingleUserNotFoundTest() {
@@ -84,7 +84,7 @@ public class ReqresTests {
     }
 
     @Test
-    @Tag("HomeWork")
+    @Tag("ApiTests")
     @DisplayName("Создание пользователя (POST)")
     @Severity(SeverityLevel.CRITICAL)
     void createUserTest() {
@@ -107,7 +107,7 @@ public class ReqresTests {
     }
 
     @Test
-    @Tag("HomeWork")
+    @Tag("ApiTests")
     @DisplayName("Обновление пользователя (PUT)")
     @Severity(SeverityLevel.CRITICAL)
     void updateUserTest() {
@@ -129,7 +129,7 @@ public class ReqresTests {
     }
 
     @Test
-    @Tag("HomeWork")
+    @Tag("ApiTests")
     @DisplayName("Удаление пользователя (DELETE)")
     @Severity(SeverityLevel.CRITICAL)
     void deleteUserTest() {
@@ -141,7 +141,7 @@ public class ReqresTests {
     }
 
     @Test
-    @Tag("Additional")
+    @Tag("ApiTests")
     @DisplayName("Успешная регистрация (POST)")
     @Severity(SeverityLevel.CRITICAL)
     void registerSuccessfulTest() {
@@ -160,7 +160,7 @@ public class ReqresTests {
     }
 
     @Test
-    @Tag("Additional")
+    @Tag("ApiTests")
     @DisplayName("Неуспешная регистрация (POST)")
     @Severity(SeverityLevel.NORMAL)
     void registerUnsuccessfulTest() {

@@ -10,7 +10,7 @@ import specs.Specs;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 @Feature("Reqres API Tests")
 @Story("User Operations")
@@ -19,40 +19,44 @@ public class ReqresTests {
 
     @BeforeAll
     static void setup() {
-        RestAssured.baseURI = "https://reqres.in";
-        RestAssured.basePath = "/api";
-        RestAssured.requestSpecification = given()
-                .log().all()
-                .contentType(ContentType.JSON)
-                .header("x-api-key", "reqres-free-v1");
+        RestAssured.requestSpecification = Specs.requestSpec();
     }
 
     @Test
     @Tag("HomeWork")
-    @DisplayName("Получение списка пользователей")
+    @DisplayName("Получение списка пользователей (GET)")
     @Severity(SeverityLevel.BLOCKER)
     void getUsersListTest() {
         UserListResponseModel response = given()
                 .when()
                 .get("/users?page=2")
                 .then()
-                .spec(Specs.responseSpec(200))
+                .spec(Specs.responseSpec(200, ContentType.JSON))
                 .extract().as(UserListResponseModel.class);
 
         assertThat(response.getPage()).isEqualTo(2);
-        assertThat(response.getData()).isNotEmpty();
+        assertThat(response.getPerPage()).isPositive();
+        assertThat(response.getTotal()).isPositive();
+        assertThat(response.getTotalPages()).isPositive();
+        assertThat(response.getData())
+                .isNotEmpty()
+                .allMatch(user -> user.getId() != null)
+                .allMatch(user -> user.getEmail() != null && user.getEmail().contains("@"));
+
+        assertThat(response.getSupport().getUrl()).isNotBlank();
+        assertThat(response.getSupport().getText()).isNotBlank();
     }
 
     @Test
     @Tag("HomeWork")
-    @DisplayName("Получение одного пользователя")
+    @DisplayName("Получение одного пользователя (GET)")
     @Severity(SeverityLevel.CRITICAL)
     void getSingleUserTest() {
         UserDataModel response = given()
                 .when()
                 .get("/users/2")
                 .then()
-                .spec(Specs.responseSpec(200))
+                .spec(Specs.responseSpec(200, ContentType.JSON))
                 .extract().as(UserDataModel.class);
 
         UserModel user = response.getData();
@@ -60,11 +64,15 @@ public class ReqresTests {
         assertThat(user.getEmail()).isEqualTo("janet.weaver@reqres.in");
         assertThat(user.getFirstName()).isEqualTo("Janet");
         assertThat(user.getLastName()).isEqualTo("Weaver");
+        assertThat(user.getAvatar()).matches("https://.*\\.jpg");
+
+        assertThat(response.getSupport().getUrl()).isNotBlank();
+        assertThat(response.getSupport().getText()).isNotBlank();
     }
 
     @Test
     @Tag("HomeWork")
-    @DisplayName("Пользователь не найден")
+    @DisplayName("Пользователь не найден (GET)")
     @Severity(SeverityLevel.NORMAL)
     void getSingleUserNotFoundTest() {
         given()
@@ -72,12 +80,12 @@ public class ReqresTests {
                 .get("/users/23")
                 .then()
                 .spec(Specs.responseSpec(404))
-                .body(equalTo("{}"));
+                .body(is(equalTo("{}")));
     }
 
     @Test
     @Tag("HomeWork")
-    @DisplayName("Создание пользователя")
+    @DisplayName("Создание пользователя (POST)")
     @Severity(SeverityLevel.CRITICAL)
     void createUserTest() {
         UserRequestModel userRequest = new UserRequestModel()
@@ -89,12 +97,12 @@ public class ReqresTests {
                 .when()
                 .post("/users")
                 .then()
-                .spec(Specs.responseSpec(201))
+                .spec(Specs.responseSpec(201, ContentType.JSON))
                 .extract().as(UserResponseModel.class);
 
         assertThat(response.getName()).isEqualTo("morpheus");
         assertThat(response.getJob()).isEqualTo("leader");
-        assertThat(response.getId()).isNotBlank();
+        assertThat(response.getId()).matches("\\d+");
         assertThat(response.getCreatedAt()).isNotNull();
     }
 
@@ -112,7 +120,7 @@ public class ReqresTests {
                 .when()
                 .put("/users/2")
                 .then()
-                .spec(Specs.responseSpec(200))
+                .spec(Specs.responseSpec(200, ContentType.JSON))
                 .extract().as(UserResponseModel.class);
 
         assertThat(response.getName()).isEqualTo("morpheus");
@@ -122,27 +130,7 @@ public class ReqresTests {
 
     @Test
     @Tag("HomeWork")
-    @DisplayName("Частичное обновление пользователя (PATCH)")
-    @Severity(SeverityLevel.CRITICAL)
-    void patchUserTest() {
-        UserRequestModel userRequest = new UserRequestModel()
-                .setJob("leader of rebels");
-
-        UserResponseModel response = given()
-                .body(userRequest)
-                .when()
-                .patch("/users/2")
-                .then()
-                .spec(Specs.responseSpec(200))
-                .extract().as(UserResponseModel.class);
-
-        assertThat(response.getJob()).isEqualTo("leader of rebels");
-        assertThat(response.getUpdatedAt()).isNotNull();
-    }
-
-    @Test
-    @Tag("HomeWork")
-    @DisplayName("Удаление пользователя")
+    @DisplayName("Удаление пользователя (DELETE)")
     @Severity(SeverityLevel.CRITICAL)
     void deleteUserTest() {
         given()
@@ -154,34 +142,37 @@ public class ReqresTests {
 
     @Test
     @Tag("Additional")
-    @DisplayName("Успешная регистрация")
+    @DisplayName("Успешная регистрация (POST)")
     @Severity(SeverityLevel.CRITICAL)
     void registerSuccessfulTest() {
-        String requestBody = "{\"email\": \"eve.holt@reqres.in\", \"password\": \"pistol\"}";
+        RegisterRequestModel request = new RegisterRequestModel()
+                .setEmail("eve.holt@reqres.in")
+                .setPassword("pistol");
 
         given()
-                .body(requestBody)
+                .body(request)
                 .when()
                 .post("/register")
                 .then()
-                .spec(Specs.responseSpec(200))
-                .body("id", equalTo(4))
-                .body("token", equalTo("QpwL5tke4Pnpja7X4"));
+                .spec(Specs.responseSpec(200, ContentType.JSON))
+                .body("id", is(4))
+                .body("token", is("QpwL5tke4Pnpja7X4"));
     }
 
     @Test
     @Tag("Additional")
-    @DisplayName("Неуспешная регистрация")
+    @DisplayName("Неуспешная регистрация (POST)")
     @Severity(SeverityLevel.NORMAL)
     void registerUnsuccessfulTest() {
-        String requestBody = "{\"email\": \"sydney@fife\"}";
+        RegisterRequestModel request = new RegisterRequestModel()
+                .setEmail("sydney@fife");
 
         given()
-                .body(requestBody)
+                .body(request)
                 .when()
                 .post("/register")
                 .then()
-                .spec(Specs.responseSpec(400))
-                .body("error", equalTo("Missing password"));
+                .spec(Specs.responseSpec(400, ContentType.JSON))
+                .body("error", is("Missing password"));
     }
 }

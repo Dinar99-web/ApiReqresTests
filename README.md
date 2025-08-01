@@ -44,5 +44,30 @@ ____
 ## <img alt="Jenkins" height="25" src="src/test/java/media/jenkins-original.svg" width="25"/></a><a name="Сборка"></a>Сборка в [Jenkins](https://jenkins.autotests.cloud/job/035-ducking_duck_ApiReqresTests/)</a>
 ____
 <p align="center">  
-<a href="https://jenkins.autotests.cloud/job/035-ducking_duck_ApiReqresTests/"><img src="src/test/java/media/allure-report.png" width="950"/></a>  
+<a href="https://jenkins.autotests.cloud/job/035-ducking_duck_ApiReqresTests/"><img src="src/test/java/media/jenkins-report.png" width="950"/></a>  
+</p>
+
+
+### **Параметры сборки в Jenkins:**
+
+- *browser (браузер, по умолчанию chrome)*
+- *browserSize (размер окна браузера, по умолчанию 1920x1080)*
+- *baseUrl (адрес тестируемого веб-сайта)*
+
+
+___
+<a id="allure"></a>
+## <img alt="Allure" height="25" src="src/test/java/media/Allure_Report.svg" width="25"/></a> <a name="Allure"></a>Allure [отчет](https://jenkins.autotests.cloud/job/035-ducking_duck_ApiReqresTests/11/allure/#)</a>
+___
+
+### *Основная страница отчёта*
+
+<p align="center">  
+<img title="Allure Overview Dashboard" src="src/test/java/media/allure-report.png" width="850">  
+</p>
+
+### *Тест-кейсы*
+
+<p align="center">  
+<img title="Allure Tests" src="src/test/java/media/test_cases.png" width="850">  
 </p>

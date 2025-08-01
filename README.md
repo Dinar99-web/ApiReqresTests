@@ -24,3 +24,25 @@ ____
 <a href="ht[images](images)tps://github.com/allure-framework/allure2"><img src="src/test/java/media/Allure_Report.svg" width="50" height="50"  alt="Allure"/></a>  
 <a href="https://www.jenkins.io/"><img src="src/test/java/media/jenkins-original.svg" width="50" height="50"  alt="Jenkins"/></a>  
 </p>
+
+____
+<a id="cases"></a>
+## <a name="Примеры автоматизированных тест-кейсов">**Примеры автоматизированных тест-кейсов:**</a>
+____
+- ✓ *Получение списка пользователей с использованием метода GET*
+- ✓ *Получение одного пользователя с использованием метода GET*
+- ✓ *Пользователь не найден с использованием метода GET*
+- ✓ *Создание пользователя с использованием метода POST*
+- ✓ *Обновление пользователя с использованием метода PUT*
+- ✓ *Удаление пользователя с использованием метода DELETE*
+- ✓ *Успешная регистрация с использованием метода POST*
+- ✓ *Неуспешная регистрация с использованием метода POST*
+
+
+  ____
+<a id="jenkins"></a>
+## <img alt="Jenkins" height="25" src="src/test/java/media/jenkins-original.svg" width="25"/></a><a name="Сборка"></a>Сборка в [Jenkins](https://jenkins.autotests.cloud/job/035-ducking_duck_ApiReqresTests/)</a>
+____
+<p align="center">  
+<a href="https://jenkins.autotests.cloud/job/035-ducking_duck_ApiReqresTests/"><img src="src/test/java/media/allure-report.png" width="950"/></a>  
+</p>

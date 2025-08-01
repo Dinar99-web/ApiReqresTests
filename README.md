@@ -16,7 +16,7 @@ ____
 ## <a name="Технологии и инструменты">**Технологии и инструменты:**</a>
 
 <p align="center">  
-<a href="https://www.jetbrains.com/idea/"><img src="test/resources/media/intellij-original.svg" width="50" height="50"  alt="IDEA"/></a>  
+<a href="https://www.jetbrains.com/idea/"><img src="src/test/java/media/intellij-original.svg" width="50" height="50"  alt="IDEA"/></a>  
 <a href="https://www.java.com/"><img src="test/resources/media/java-original.svg" width="50" height="50"  alt="Java"/></a>  
 <a href="https://github.com/"><img src="test/resources/media/github-original.svg" width="50" height="50"  alt="Github"/></a>  
 <a href="https://junit.org/junit5/"><img src="test/resources/media/junit-original.svg" width="50" height="50"  alt="JUnit 5"/></a>  

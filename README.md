@@ -11,6 +11,8 @@ ____
 * <a href="#jenkins">Сборка в Jenkins</a>
 
 * <a href="#allure">Allure отчет</a>
+
+* <a href="#telegram">Уведомления в Telegram с использованием бота</a>
 ____
 <a id="tools"></a>
 ## <a name="Технологии и инструменты">**Технологии и инструменты:**</a>
@@ -74,6 +76,8 @@ ___
 <img title="Allure Tests" src="src/test/java/media/allure2.png" width="850">  
 </p>
 
+___
+<a id="telegram"></a>
 ## <img width="4%" style="vertical-align:middle" title="Telegram" src="src/test/java/media/icons8-телеграм.svg"> Уведомления в Telegram с использованием бота
 
 <p align="center">

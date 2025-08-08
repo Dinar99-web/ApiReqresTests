@@ -2,8 +2,8 @@
   "base": {
     "logo": "",
     "project": "${JOB_NAME}",
-    "environment": "${ENVIRONMENT}",
-    "comment": "${COMMENT}",
+    "environment": "some env",
+    "comment": "some comm",
     "reportLink": "${BUILD_URL}",
     "language": "en",
     "allureFolder": "allure-report",

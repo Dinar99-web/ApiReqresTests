@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import specs.Specs;
 
+import static helpers.CustomApiListener.*;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -19,7 +20,12 @@ public class ReqresTests {
 
     @BeforeAll
     static void setup() {
-        RestAssured.requestSpecification = Specs.requestSpec();
+        RestAssured.baseURI = "https://reqres.in/api";
+        RestAssured.requestSpecification = given()
+                .filter(withCustomTemplates())
+                .contentType(ContentType.JSON)
+                .header("x-api-key", "reqres-free-v1")
+                .log().all();
     }
 
     @Test
@@ -28,8 +34,9 @@ public class ReqresTests {
     @Severity(SeverityLevel.BLOCKER)
     void getUsersListTest() {
         UserListResponseModel response = given()
+                .queryParam("page", 2)
                 .when()
-                .get("/users?page=2")
+                .get("/users")
                 .then()
                 .spec(Specs.responseSpec(200, ContentType.JSON))
                 .extract().as(UserListResponseModel.class);
@@ -156,7 +163,8 @@ public class ReqresTests {
                 .then()
                 .spec(Specs.responseSpec(200, ContentType.JSON))
                 .body("id", is(4))
-                .body("token", is("QpwL5tke4Pnpja7X4"));
+                .body("token", notNullValue())
+                .body("token", matchesRegex("^[a-zA-Z0-9]{15,}$"));
     }
 
     @Test

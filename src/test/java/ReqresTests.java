@@ -1,14 +1,12 @@
 import io.qameta.allure.*;
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
 import models.*;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import specs.Specs;
 
-import static helpers.CustomApiListener.*;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -16,42 +14,46 @@ import static org.hamcrest.Matchers.*;
 @Feature("Reqres API Tests")
 @Story("User Operations")
 @Owner("Dinar Aminev")
-public class ReqresTests {
-
-    @BeforeAll
-    static void setup() {
-        RestAssured.baseURI = "https://reqres.in/api";
-        RestAssured.requestSpecification = given()
-                .filter(withCustomTemplates())
-                .contentType(ContentType.JSON)
-                .header("x-api-key", "reqres-free-v1")
-                .log().all();
-    }
+public class ReqresTests extends TestBase {
 
     @Test
     @Tag("ApiTests")
     @DisplayName("Получение списка пользователей (GET)")
     @Severity(SeverityLevel.BLOCKER)
     void getUsersListTest() {
-        UserListResponseModel response = given()
-                .queryParam("page", 2)
-                .when()
-                .get("/users")
-                .then()
-                .spec(Specs.responseSpec(200, ContentType.JSON))
-                .extract().as(UserListResponseModel.class);
+        Allure.step("Подготовка запроса: GET /users?page=2", () -> {
+            ValidatableResponse response = given()
+                    .queryParam("page", 2)
+                    .when()
+                    .get("/users")
+                    .then()
+                    .spec(Specs.responseSpec(200, ContentType.JSON));
 
-        assertThat(response.getPage()).isEqualTo(2);
-        assertThat(response.getPerPage()).isPositive();
-        assertThat(response.getTotal()).isPositive();
-        assertThat(response.getTotalPages()).isPositive();
-        assertThat(response.getData())
-                .isNotEmpty()
-                .allMatch(user -> user.getId() != null)
-                .allMatch(user -> user.getEmail() != null && user.getEmail().contains("@"));
+            Allure.step("Проверка структуры ответа", () -> {
+                UserListResponseModel model = response.extract().as(UserListResponseModel.class);
 
-        assertThat(response.getSupport().getUrl()).isNotBlank();
-        assertThat(response.getSupport().getText()).isNotBlank();
+                assertThat(model.getPage()).isEqualTo(2);
+                assertThat(model.getPerPage()).isPositive();
+                assertThat(model.getTotal()).isPositive();
+                assertThat(model.getTotalPages()).isPositive();
+            });
+
+            Allure.step("Проверка данных пользователей", () -> {
+                UserListResponseModel model = response.extract().as(UserListResponseModel.class);
+
+                assertThat(model.getData())
+                        .isNotEmpty()
+                        .allMatch(user -> user.getId() != null)
+                        .allMatch(user -> user.getEmail() != null && user.getEmail().contains("@"));
+            });
+
+            Allure.step("Проверка support-блока", () -> {
+                UserListResponseModel model = response.extract().as(UserListResponseModel.class);
+
+                assertThat(model.getSupport().getUrl()).isNotBlank();
+                assertThat(model.getSupport().getText()).isNotBlank();
+            });
+        });
     }
 
     @Test
@@ -59,22 +61,30 @@ public class ReqresTests {
     @DisplayName("Получение одного пользователя (GET)")
     @Severity(SeverityLevel.CRITICAL)
     void getSingleUserTest() {
-        UserDataModel response = given()
-                .when()
-                .get("/users/2")
-                .then()
-                .spec(Specs.responseSpec(200, ContentType.JSON))
-                .extract().as(UserDataModel.class);
+        Allure.step("Отправка запроса: GET /users/2", () -> {
+            ValidatableResponse response = given()
+                    .when()
+                    .get("/users/2")
+                    .then()
+                    .spec(Specs.responseSpec(200, ContentType.JSON));
 
-        UserModel user = response.getData();
-        assertThat(user.getId()).isEqualTo(2);
-        assertThat(user.getEmail()).isEqualTo("janet.weaver@reqres.in");
-        assertThat(user.getFirstName()).isEqualTo("Janet");
-        assertThat(user.getLastName()).isEqualTo("Weaver");
-        assertThat(user.getAvatar()).matches("https://.*\\.jpg");
+            Allure.step("Проверка данных пользователя", () -> {
+                UserDataModel model = response.extract().as(UserDataModel.class);
+                UserModel user = model.getData();
 
-        assertThat(response.getSupport().getUrl()).isNotBlank();
-        assertThat(response.getSupport().getText()).isNotBlank();
+                assertThat(user.getId()).isEqualTo(2);
+                assertThat(user.getEmail()).isEqualTo("janet.weaver@reqres.in");
+                assertThat(user.getFirstName()).isEqualTo("Janet");
+                assertThat(user.getLastName()).isEqualTo("Weaver");
+                assertThat(user.getAvatar()).matches("https://.*\\.jpg");
+            });
+
+            Allure.step("Проверка support-блока", () -> {
+                UserDataModel model = response.extract().as(UserDataModel.class);
+                assertThat(model.getSupport().getUrl()).isNotBlank();
+                assertThat(model.getSupport().getText()).isNotBlank();
+            });
+        });
     }
 
     @Test
@@ -82,12 +92,14 @@ public class ReqresTests {
     @DisplayName("Пользователь не найден (GET)")
     @Severity(SeverityLevel.NORMAL)
     void getSingleUserNotFoundTest() {
-        given()
-                .when()
-                .get("/users/23")
-                .then()
-                .spec(Specs.responseSpec(404))
-                .body(is(equalTo("{}")));
+        Allure.step("Отправка запроса: GET /users/23", () -> {
+            given()
+                    .when()
+                    .get("/users/23")
+                    .then()
+                    .spec(Specs.responseSpec(404))
+                    .body(is(equalTo("{}")));
+        });
     }
 
     @Test
@@ -95,22 +107,29 @@ public class ReqresTests {
     @DisplayName("Создание пользователя (POST)")
     @Severity(SeverityLevel.CRITICAL)
     void createUserTest() {
-        UserRequestModel userRequest = new UserRequestModel()
-                .setName("morpheus")
-                .setJob("leader");
+        Allure.step("Подготовка тестовых данных", () -> {
+            UserRequestModel userRequest = new UserRequestModel()
+                    .setName("morpheus")
+                    .setJob("leader");
 
-        UserResponseModel response = given()
-                .body(userRequest)
-                .when()
-                .post("/users")
-                .then()
-                .spec(Specs.responseSpec(201, ContentType.JSON))
-                .extract().as(UserResponseModel.class);
+            Allure.step("Отправка запроса: POST /users", () -> {
+                ValidatableResponse response = given()
+                        .body(userRequest)
+                        .when()
+                        .post("/users")
+                        .then()
+                        .spec(Specs.responseSpec(201, ContentType.JSON));
 
-        assertThat(response.getName()).isEqualTo("morpheus");
-        assertThat(response.getJob()).isEqualTo("leader");
-        assertThat(response.getId()).matches("\\d+");
-        assertThat(response.getCreatedAt()).isNotNull();
+                Allure.step("Проверка ответа", () -> {
+                    UserResponseModel responseModel = response.extract().as(UserResponseModel.class);
+
+                    assertThat(responseModel.getName()).isEqualTo("morpheus");
+                    assertThat(responseModel.getJob()).isEqualTo("leader");
+                    assertThat(responseModel.getId()).matches("\\d+");
+                    assertThat(responseModel.getCreatedAt()).isNotNull();
+                });
+            });
+        });
     }
 
     @Test
@@ -118,21 +137,28 @@ public class ReqresTests {
     @DisplayName("Обновление пользователя (PUT)")
     @Severity(SeverityLevel.CRITICAL)
     void updateUserTest() {
-        UserRequestModel userRequest = new UserRequestModel()
-                .setName("morpheus")
-                .setJob("zion resident");
+        Allure.step("Подготовка тестовых данных", () -> {
+            UserRequestModel userRequest = new UserRequestModel()
+                    .setName("morpheus")
+                    .setJob("zion resident");
 
-        UserResponseModel response = given()
-                .body(userRequest)
-                .when()
-                .put("/users/2")
-                .then()
-                .spec(Specs.responseSpec(200, ContentType.JSON))
-                .extract().as(UserResponseModel.class);
+            Allure.step("Отправка запроса: PUT /users/2", () -> {
+                ValidatableResponse response = given()
+                        .body(userRequest)
+                        .when()
+                        .put("/users/2")
+                        .then()
+                        .spec(Specs.responseSpec(200, ContentType.JSON));
 
-        assertThat(response.getName()).isEqualTo("morpheus");
-        assertThat(response.getJob()).isEqualTo("zion resident");
-        assertThat(response.getUpdatedAt()).isNotNull();
+                Allure.step("Проверка ответа", () -> {
+                    UserResponseModel responseModel = response.extract().as(UserResponseModel.class);
+
+                    assertThat(responseModel.getName()).isEqualTo("morpheus");
+                    assertThat(responseModel.getJob()).isEqualTo("zion resident");
+                    assertThat(responseModel.getUpdatedAt()).isNotNull();
+                });
+            });
+        });
     }
 
     @Test
@@ -140,11 +166,13 @@ public class ReqresTests {
     @DisplayName("Удаление пользователя (DELETE)")
     @Severity(SeverityLevel.CRITICAL)
     void deleteUserTest() {
-        given()
-                .when()
-                .delete("/users/2")
-                .then()
-                .spec(Specs.responseSpec(204));
+        Allure.step("Отправка запроса: DELETE /users/2", () -> {
+            given()
+                    .when()
+                    .delete("/users/2")
+                    .then()
+                    .spec(Specs.responseSpec(204));
+        });
     }
 
     @Test
@@ -152,19 +180,26 @@ public class ReqresTests {
     @DisplayName("Успешная регистрация (POST)")
     @Severity(SeverityLevel.CRITICAL)
     void registerSuccessfulTest() {
-        RegisterRequestModel request = new RegisterRequestModel()
-                .setEmail("eve.holt@reqres.in")
-                .setPassword("pistol");
+        Allure.step("Подготовка тестовых данных", () -> {
+            RegisterRequestModel request = new RegisterRequestModel()
+                    .setEmail("eve.holt@reqres.in")
+                    .setPassword("pistol");
 
-        given()
-                .body(request)
-                .when()
-                .post("/register")
-                .then()
-                .spec(Specs.responseSpec(200, ContentType.JSON))
-                .body("id", is(4))
-                .body("token", notNullValue())
-                .body("token", matchesRegex("^[a-zA-Z0-9]{15,}$"));
+            Allure.step("Отправка запроса: POST /register", () -> {
+                ValidatableResponse response = given()
+                        .body(request)
+                        .when()
+                        .post("/register")
+                        .then()
+                        .spec(Specs.responseSpec(200, ContentType.JSON));
+
+                Allure.step("Проверка ответа", () -> {
+                    response.body("id", is(4))
+                            .body("token", notNullValue())
+                            .body("token", matchesRegex("^[a-zA-Z0-9]{15,}$"));
+                });
+            });
+        });
     }
 
     @Test
@@ -172,15 +207,19 @@ public class ReqresTests {
     @DisplayName("Неуспешная регистрация (POST)")
     @Severity(SeverityLevel.NORMAL)
     void registerUnsuccessfulTest() {
-        RegisterRequestModel request = new RegisterRequestModel()
-                .setEmail("sydney@fife");
+        Allure.step("Подготовка тестовых данных (без пароля)", () -> {
+            RegisterRequestModel request = new RegisterRequestModel()
+                    .setEmail("sydney@fife");
 
-        given()
-                .body(request)
-                .when()
-                .post("/register")
-                .then()
-                .spec(Specs.responseSpec(400, ContentType.JSON))
-                .body("error", is("Missing password"));
+            Allure.step("Отправка запроса: POST /register", () -> {
+                given()
+                        .body(request)
+                        .when()
+                        .post("/register")
+                        .then()
+                        .spec(Specs.responseSpec(400, ContentType.JSON))
+                        .body("error", is("Missing password"));
+            });
+        });
     }
 }
